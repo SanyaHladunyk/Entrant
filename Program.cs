@@ -1,4 +1,5 @@
 ﻿using System;
+using SimpleClassLibrary;
 
 namespace Entrant
 {
@@ -7,28 +8,33 @@ namespace Entrant
         static void Main(string[] args)
         {
 
-            Entrant[] entrants = ReadEntrantArray();
-            Console.WriteLine("\n\n1.Переглянути масив\n" +
+            Entrants[] entrants = ReadEntrantArray();
+            
+            bool checkExitMenu = false;
+            while (!checkExitMenu)
+            {
+                Console.Write("\n\n1.Переглянути масив\n" +
                     "2.Сортувати за спаданням конкурсного балу студентів\n" +
                     "3.Сортувати за прізвищем\n" +
                     "4.Отримати дані про найвищий та найнижчий конкурсний бал студентів\n" +
                     "5.Вихід\n" +
                     "Ваш вибір: ");
-            bool checkExitMenu = false;
-            while (!checkExitMenu)
-            {
                 try
                 {
                     int n = Int32.Parse(Console.ReadLine());
                     switch (n)
                     {
                         case 1:
+                            Console.WriteLine("\n");
                             PrintEntrants(entrants);
                             break;
                         case 2:
+                            Console.WriteLine("\nМасив відсортовано");
                             SortEntrantsByPoints(ref entrants);
                             break;
-                        case 3:SortEntrantsByName(ref entrants);
+                        case 3:
+                            Console.WriteLine("\nМасив відсортовано"); 
+                            SortEntrantsByName(ref entrants);
                             break;
                         case 4:
                             GetEntrantsInfo(entrants, out double maxBal, out double minBal);
@@ -49,7 +55,7 @@ namespace Entrant
                 }
             }
         }
-        static Entrant[] ReadEntrantArray()
+        static Entrants[] ReadEntrantArray()
         {
             string Name;
             int CoursePoints = 0,
@@ -75,9 +81,9 @@ namespace Entrant
                 }
             }
 
-            Entrant[] arrEntrant = new Entrant[n];
+            Entrants[] arrEntrant = new Entrants[n];
             Console.WriteLine("Введіть дані про студентів");
-            for (int i = 0; i < n; i++)
+            for (int i = 0; i <= n-1; i++)
             {
                 Console.Write("Ім'я: ");
                 Name = Console.ReadLine();
@@ -111,12 +117,13 @@ namespace Entrant
                 }
                 Console.Write("Кількість ЗНО: ");
                 loopExit = false;
+                int number = 0;
                 while (!loopExit)
                 {
                     try
                     {
-                        n = Int32.Parse(Console.ReadLine());
-                        if(n>0)
+                        number = Int32.Parse(Console.ReadLine());
+                        if(number > 0)
                             loopExit = true;
                         else Console.WriteLine("Введіть число більше нуля!");
                     }
@@ -125,10 +132,10 @@ namespace Entrant
                         Console.WriteLine("Введено некоректне значення! Повторіть спробу.");
                     }
                 }
-                zno = new ZNO[n];
+                zno = new ZNO[number];
                 string Subject;
                 int Points = 0;
-                for (int j = 0; j < n; j++)
+                for (int j = 0; j < number; j++)
                 {
                     
                     Console.Write("Предмет: ");
@@ -147,13 +154,13 @@ namespace Entrant
                             Console.WriteLine("Введено некоректне значення! Повторіть спробу.");
                         }
                     }
-                    zno[i] = new ZNO(Subject, Points);
+                    zno[j] = new ZNO(Subject, Points);
                 }
-                arrEntrant[i] = new Entrant(Name, CoursePoints, AvgPoints, zno);
+                arrEntrant[i] = new Entrants(Name, CoursePoints, AvgPoints, zno);
             }
             return arrEntrant;
         }
-        static void PrintEntrant(Entrant entrant)
+        static void PrintEntrant(Entrants entrant)
         {
             Console.WriteLine($"ID: {entrant.IdNum}");
             Console.WriteLine($"Ім'я: {entrant.Name}");
@@ -166,14 +173,14 @@ namespace Entrant
             }
 
         }
-        static void PrintEntrants(Entrant[] entrants)
+        static void PrintEntrants(Entrants[] entrants)
         {
-            foreach (Entrant entrant in entrants)
+            foreach (Entrants entrant in entrants)
             {
                 PrintEntrant(entrant);
             }
         }
-        static void GetEntrantsInfo(Entrant[] entrants, out double maxBal, out double minBal)
+        static void GetEntrantsInfo(Entrants[] entrants, out double maxBal, out double minBal)
         {
             maxBal = minBal = entrants[0].GetCompMark();
             foreach (var entrant in entrants)
@@ -184,11 +191,11 @@ namespace Entrant
                     minBal = entrant.GetCompMark();
             }
         }
-        static void SortEntrantsByPoints(ref Entrant[] entrants)
+        static void SortEntrantsByPoints(ref Entrants[] entrants)
         {
             Array.Sort(entrants, SortInfoByPoints);
         }
-        static int SortInfoByPoints(Entrant a, Entrant b)
+        static int SortInfoByPoints(Entrants a, Entrants b)
         {
             if (a.GetCompMark() > b.GetCompMark())
                 return 1;
@@ -196,11 +203,11 @@ namespace Entrant
                 return -1;
             return 0;
         }
-        static void SortEntrantsByName(ref Entrant[] entrants)
+        static void SortEntrantsByName(ref Entrants[] entrants)
         {
             Array.Sort(entrants, SortInfoByName);
         }
-        static int SortInfoByName(Entrant a, Entrant b)
+        static int SortInfoByName(Entrants a, Entrants b)
         {
             var part1 = a.Name;
             var part2 = b.Name;
@@ -211,98 +218,5 @@ namespace Entrant
         }
 
     }
-    class Entrant
-    {
-        private string _Name;
-        private Guid _IdNum;
-        private int _CoursePoints;
-        private int _AvgPoints;
-        private ZNO []_ZNOResult;
-        public string Name { get { return _Name; } set { _Name = value; } }
-        public Guid IdNum { get { return _IdNum; } set { _IdNum = value; } }
-        public int CoursePoints { get { return _CoursePoints; } set { _CoursePoints = value; } }
-        public int AvgPoints { get { return _AvgPoints; } set { _AvgPoints = value; } }
-        public ZNO []ZNOResult { get { return _ZNOResult; } set { _ZNOResult = value; } }
-        public Entrant(string Name, int CoursePoints, int AvgPoints, ZNO []ZNOResult)
-        {
-            _Name = Name;
-            _IdNum = new Guid();
-            _CoursePoints = CoursePoints;
-            _AvgPoints = AvgPoints;
-            _ZNOResult = new ZNO[ZNOResult.Length];
-            for (int i = 0; i < ZNOResult.Length; i++)
-            {
-                _ZNOResult[i] = new ZNO(ZNOResult[i]);
-            }
-        }
-        public double GetCompMark()
-        {
-            if(_ZNOResult.Length > 2)
-            {
-                double bal;
-                bal = CoursePoints * 0.05 + AvgPoints * 0.1;
-
-                bal += ZNOResult[0].Points * 0.25;
-                bal += ZNOResult[1].Points * 0.4;
-                bal += ZNOResult[2].Points * 0.2;
-                return bal;
-
-            }
-            else return 0;
-        }
-        public string GetBestSubject()
-        {
-            if (_ZNOResult.Length > 1)
-            {
-                int SubjectValue = _ZNOResult[0].Points;
-                string SubjectName = _ZNOResult[0].Subject;
-                for (int i = 1; i < _ZNOResult.Length; i++)
-                {
-                    if(_ZNOResult[i].Points > SubjectValue)
-                    {
-                        SubjectName = _ZNOResult[i].Subject;
-                        SubjectValue = _ZNOResult[i].Points;
-                    }
-                }
-                return SubjectName;
-            }
-            else return _ZNOResult[0].Subject;
-        }
-        public string GetWorstSubject()
-        {
-            if (_ZNOResult.Length > 1)
-            {
-                int SubjectValue = _ZNOResult[0].Points;
-                string SubjectName = _ZNOResult[0].Subject;
-                for (int i = 1; i < _ZNOResult.Length; i++)
-                {
-                    if (_ZNOResult[i].Points < SubjectValue)
-                    {
-                        SubjectName = _ZNOResult[i].Subject;
-                        SubjectValue = _ZNOResult[i].Points;
-                    }
-                }
-                return SubjectName;
-            }
-            else return _ZNOResult[0].Subject;
-        }
-
-    }
-    class ZNO
-    {
-        private string _Subject;
-        private int _Points;
-        public string Subject { get { return _Subject; } set { _Subject = value; } }
-        public int Points { get { return _Points; } set { _Points = value; } }
-        public ZNO(string Subject, int Points)
-        {
-            _Subject = Subject;
-            _Points = Points;
-        }
-        public ZNO(ZNO znoResult)
-        {
-            _Subject = znoResult.Subject;
-            _Points = znoResult.Points;
-        }
-    }
+ 
 }
